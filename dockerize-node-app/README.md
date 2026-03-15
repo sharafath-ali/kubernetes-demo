@@ -12,27 +12,79 @@ dockerize-node-app/
 └── .dockerignore   ← Excludes node_modules from the image
 ```
 
-## How to Build the Image
+## Steps to Run
 
-From the `dockerize-node-app/` directory:
+> ⚠️ You must **build first** before running. Docker cannot run an image that doesn't exist locally.
+
+---
+
+### Step 1 — Build the Docker image
+
+Navigate into the project folder and build:
 
 ```bash
+cd dockerize-node-app
 docker build -t node-docker-app .
 ```
 
 | Part | Meaning |
 |------|---------|
-| `docker build` | Builds a Docker image |
-| `-t node-docker-app` | Tags (names) the image as `node-docker-app` |
-| `.` | Use the current directory (reads the `Dockerfile`) |
+| `docker build` | Reads the `Dockerfile` and builds an image |
+| `-t node-docker-app` | Names the image `node-docker-app` |
+| `.` | Use the current directory as build context |
 
-## How to Run the Container
+You only need to rebuild when you change `app.js`, `package.json`, or `Dockerfile`.
 
+---
+
+### Step 2 — Run the container
+
+**Option A — Foreground (see logs in terminal):**
 ```bash
 docker run --rm -p 3000:3000 node-docker-app
 ```
 
-Then open: **http://localhost:3000**
+**Option B — Background (detached mode):**
+```bash
+docker run -d -p 3000:3000 --name my-node-app node-docker-app
+```
+
+| Flag | Meaning |
+|------|---------|
+| `--rm` | Auto-remove container when it stops |
+| `-d` | Run in background (detached) |
+| `-p 3000:3000` | Bind `localhost:3000` → container port `3000` |
+| `--name my-node-app` | Give the container a name (easier to manage) |
+| `node-docker-app` | The image to run (must be built first!) |
+
+---
+
+### Step 3 — Open in browser
+
+```
+http://localhost:3000
+```
+
+---
+
+### Step 4 — Stop the container
+
+```bash
+# If running in foreground:
+Ctrl+C
+
+# If running in background:
+docker stop my-node-app
+```
+
+---
+
+> ❌ **Common Mistake:** Running `docker run` without building first gives this error:
+> ```
+> Unable to find image 'node-docker-app:latest' locally
+> pull access denied — repository does not exist
+> ```
+> Fix: always run `docker build -t node-docker-app .` first!
 
 ## Dockerfile Explained
 
