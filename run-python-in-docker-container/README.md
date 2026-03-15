@@ -1,6 +1,6 @@
 # Run Python with Docker
 
-Run Python scripts **without installing Python** — using Docker instead.
+Run Python scripts **without installing Python in local** — using Docker instead.
 
 ## Prerequisites
 
