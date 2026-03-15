@@ -90,7 +90,7 @@ docker stop my-node-app
 
 ```dockerfile
 FROM node:18-alpine        # Base image — Node 18 on lightweight Alpine Linux
-WORKDIR /app               # Set working directory inside container
+WORKDIR /app               # Like: mkdir -p /app && cd /app  (explained below)
 COPY package.json .        # Copy package.json first (for caching)
 RUN npm install            # Install dependencies
 COPY . .                   # Copy rest of source code
@@ -98,7 +98,40 @@ EXPOSE 3000                # Tell Docker the app uses port 3000
 CMD ["node", "app.js"]     # Command to start the app
 ```
 
-### Why copy `package.json` before the rest of the code?
+### Why `WORKDIR /app`?
+
+`WORKDIR /app` does two things in one:
+```bash
+mkdir -p /app   # create the /app directory if it doesn't exist
+cd /app         # set it as current working directory
+```
+
+Every command after it — `COPY`, `RUN`, `CMD` — runs from inside `/app`.
+
+**❌ Without `WORKDIR`** — files land at `/` root (Linux system root):
+```
+/
+├── bin/          ← system binaries
+├── etc/          ← system configs
+├── lib/          ← system libraries
+├── app.js        ← 😬 your file mixed with OS files!
+├── package.json  ← 😬 mixed in!
+└── node_modules/ ← 😬 thousands of files at root!
+```
+Risk: you could accidentally overwrite system files with `COPY`.
+
+**✅ With `WORKDIR /app`** — clean and isolated:
+```
+/
+├── bin/
+├── etc/
+├── app/          ← your dedicated folder
+│   ├── app.js
+│   ├── package.json
+│   └── node_modules/
+```
+
+
 
 Docker builds images **layer by layer**. If you copy everything at once, any code change rebuilds the `npm install` layer (slow). By copying `package.json` first:
 
