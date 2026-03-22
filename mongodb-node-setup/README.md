@@ -35,7 +35,9 @@ This repository contains different setups for containerizing and running a Node.
 
 ### `node_modules`
 - **In Development (`mongodb-node-setup`):** You see `node_modules` locally on your computer because you ran `npm install` directly on your machine. The Node.js app is running locally, not inside a container.
+  - *Verify locally:* Run `dir` (Windows) or `ls` (Mac/Linux) in your terminal. You will see the `node_modules` folder sitting right here on your host machine.
 - **In Production (`dockerize-node-app`):** You don't see `node_modules` locally because it gets installed *inside* the Docker container when the image is built. This keeps your computer's folders clean and ensures the dependencies are built for the specific Linux environment inside the container!
+  - *Verify inside the container:* If you start the container and run `docker exec -it <container_id_or_name> ls -la` in your terminal, it will list all the files *inside* the running container, and you will see that `node_modules` was successfully installed in there!
 
 ### `.dockerignore`
 - **Why we need it:** When building a Docker image, Docker copies your project files into the image. However, we do **not** want to copy our local `node_modules` folder. Dependencies compiled on Windows or macOS might crash on the Linux environment inside the container. We use `.dockerignore` to tell Docker to ignore `node_modules` entirely, forcing it to run a fresh `npm install` from scratch inside the container.
