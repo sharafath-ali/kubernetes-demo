@@ -1,0 +1,14 @@
+{
+  "name": "mongodb-node-setup",
+  "version": "1.0.0",
+  "description": "A simple Node.js backend connecting to a Dockerized MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.3.4"
+  }
+}
