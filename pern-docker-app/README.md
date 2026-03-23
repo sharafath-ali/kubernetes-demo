@@ -29,4 +29,21 @@ You can connect to and check the PostgreSQL database using any database client (
 - **Password**: `pern_password`
 
 ## How it works
-Both the `api` and `frontend` have their own `Dockerfile`s. `docker-compose.yml` builds these images locally and wires them together with the official Postgres image on a shared Docker network (`pern-network`) so they can communicate seamlessly!
+
+Behind the scenes, `docker-compose.yml` orchestrates three separate containers (`db`, `api`, and `frontend`) and connects them using core Docker concepts:
+
+### 1. Volumes (Data Persistence)
+- **What it is:** A volume is like a dedicated external hard drive for a container. By default, when a container is destroyed, all data inside it is lost. Volumes solve this by storing data safely on your host machine.
+- **How it's used here:** We use a volume named `pgdata` to store the Postgres database files (`/var/lib/postgresql/data`). Even if you stop or remove the `db` container, your database records (tables, users) will survive. When you spin the container back up, Postgres reattaches to the volume and your data is exactly how you left it.
+
+### 2. Networks (Internal Communication)
+- **What it is:** A Docker network is a private, isolated virtual network that allows containers to talk to each other securely without exposing themselves to the outside world.
+- **How it's used here:** We created a shared network called `pern-network`. Because all three containers (`db`, `api`, `frontend`) are on this same network, they can communicate using their container names as hostnames. 
+  - For example, the backend API doesn't connect to `localhost:5432` to reach the database; it connects to `db:5432`. Docker's internal DNS automatically routes the traffic to the correct container.
+
+### 3. Ports (External Access)
+- **What it is:** Port mapping (or publishing) is how you open a "door" from your actual computer (the host) into the isolated container.
+- **How it's used here:** Containers are mapped using the `HOST_PORT:CONTAINER_PORT` format.
+  - **`5173:5173`:** Allows you to open `localhost:5173` in your web browser to view the React frontend.
+  - **`5000:5000`:** Allows you to access the backend API at `localhost:5000` from your browser or Postman.
+  - **`5432:5432`:** Allows database clients (like pgAdmin) installed on your computer to connect directly to the Postgres database for management.
