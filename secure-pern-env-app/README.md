@@ -33,7 +33,7 @@ You can connect to and check the PostgreSQL database using any database client (
 
 ## 🔒 Secure Environment Setup (.env)
 Unlike the basic demo, this specific setup (`secure-pern-env-app`) demonstrates industry-standard security practices:
-1. **`.env` File**: Database usernames and passwords are mathematically removed from `docker-compose.yml` and placed inside a hidden `.env` file instead.
+1. **`.env` File**: Passwords and secret keys are removed from `docker-compose.yml` and securely stored in a hidden `.env` file instead.
 2. **`.gitignore`**: The `.env` file is explicitly ignored by Git, ensuring you never accidentally commit your production passwords to GitHub.
 3. **`docker-compose.yml` Variables**: `docker-compose.yml` now uses the `${VARIABLE_NAME}` syntax to safely inject the secrets automatically when you run `docker-compose up`!
 
