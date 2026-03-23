@@ -33,7 +33,12 @@ docker build -t node-docker-app .
 | `-t node-docker-app` | Names the image `node-docker-app` |
 | `.` | Use the current directory as build context |
 
-You only need to rebuild when you change `app.js`, `package.json`, or `Dockerfile`.
+**What happens under the hood?**
+Think of the `Dockerfile` as a **plan or recipe** for creating a Docker **image** of your app. When you run `docker build`, Docker executes this plan step-by-step to package your code, dependencies, and environment into that read-only image. 
+
+Later, we run that image inside an isolated environment called a **container**. This guarantees your app will run identically on any machine, completely independent of the host operating system.
+
+> 💡 *Note: You only need to rebuild the image when you modify `app.js`, `package.json`, or the `Dockerfile` itself.*
 
 ---
 
