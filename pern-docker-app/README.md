@@ -17,7 +17,16 @@ This directory contains a complete containerized PERN (Postgres, Express, React,
 4. Test it out!
    - Frontend React App: [http://localhost:5173](http://localhost:5173)
    - Backend API: [http://localhost:5000](http://localhost:5000)
-   - Postgres Database is exposed locally on port `5432` if you want to connect via pgAdmin/Compass.
+
+## Checking the Database
+
+You can connect to and check the PostgreSQL database using any database client (such as pgAdmin, DBeaver, or a VS Code extension). Use the following connection details:
+
+- **Host**: `localhost`
+- **Port**: `5432`
+- **Database**: `pern_database`
+- **Username**: `pern_user`
+- **Password**: `pern_password`
 
 ## How it works
 Both the `api` and `frontend` have their own `Dockerfile`s. `docker-compose.yml` builds these images locally and wires them together with the official Postgres image on a shared Docker network (`pern-network`) so they can communicate seamlessly!
