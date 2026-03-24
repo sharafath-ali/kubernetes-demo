@@ -28,19 +28,21 @@ You can connect to and check the PostgreSQL database using any database client (
 - **Username**: `pern_user`
 - **Password**: `pern_password`
 
-
 ---
 
 ## 🔒 Secure Environment Setup (.env)
+
 Unlike the basic demo, this specific setup (`secure-pern-env-app`) demonstrates industry-standard security practices:
+
 1. **`.env` File**: Passwords and secret keys are removed from `docker-compose.yml` and securely stored in a hidden `.env` file instead.
 2. **`.gitignore`**: The `.env` file is explicitly ignored by Git, ensuring you never accidentally commit your production passwords to GitHub.
 3. **`docker-compose.yml` Variables**: `docker-compose.yml` now uses the `${VARIABLE_NAME}` syntax to safely inject the secrets automatically when you run `docker-compose up`!
 
 ### 🚀 How this works in Production (AWS, GCP, Kubernetes)
-While the `.env` file is perfect for local development, production platforms like AWS, GCP, or other orchestration tools won't typically ask for a `.env` file directly. 
 
-Instead, they provide a secure way to set environment variables through their own configuration systems (such as a web console, CLI, or deployment manifests). 
+While the `.env` file is perfect for local development, production platforms like AWS, GCP, or other orchestration tools won't typically ask for a `.env` file directly.
+
+Instead, they provide a secure way to set environment variables through their own configuration systems (such as a web console, CLI, or deployment manifests).
 
 When you deploy, the production environment securely injects those values directly into the container process at runtime. Because your `docker-compose.yml` and application code are already set up to look for variables like `POSTGRES_USER` or `DB_PORT`, your app will seamlessly pick up the production values without relying on a `.env` file inside the container!
 
@@ -51,14 +53,19 @@ When you deploy, the production environment securely injects those values direct
 ### 🌐 Local Development (What you’re doing now)
 
 When you run apps locally:
-* Frontend → `localhost:5174` (mapped to 5173)
-* Backend → `localhost:5001` (mapped to 5000)
-* Database → `localhost:5433` (mapped to 5432)
+
+- Frontend → `localhost:5174` (mapped to 5173)
+- Backend → `localhost:5001` (mapped to 5000)
+- Database → `localhost:5433` (mapped to 5432)
 
 👉 `localhost` means **your own machine**
 👉 Port is just a **door to access a running service**
 
- 
+So when you type:
+`localhost:5174`
+You are telling the browser:
+
+> “Go to my machine and access the app running on port 5174”
 
 ### 🔗 How Services Talk in Docker
 
@@ -71,9 +78,10 @@ Instead, they use:
 
 **What does `networks: driver: bridge` do?**
 In our `docker-compose.yml`, we define a network with `driver: bridge`.
-* A **bridge** network acts as a private, isolated sandbox inside your machine. 
-* All containers placed on this bridge (`pern-network`) can freely resolve each other's names (e.g., the API container can just ask for `db` and Docker routes it directly).
-* It groups your stack securely, ensuring no exterior containers or local host processes can interfere with that internal communication.
+
+- A **bridge** network acts as a private, isolated sandbox inside your machine.
+- All containers placed on this bridge (`pern-network`) can freely resolve each other's names (e.g., the API container can just ask for `db` and Docker routes it directly).
+- It groups your stack securely, ensuring no exterior containers or local host processes can interfere with that internal communication.
 
 ### 🚀 What Changes in Production
 
@@ -81,12 +89,14 @@ In production, things are more controlled and secure.
 You **do NOT expose everything like in development**
 
 Only one main entry is exposed:
-* Usually your app is accessible via a domain (like `example.com`)
+
+- Usually your app is accessible via a domain (like `example.com`)
 
 ### 🌍 How Domain Connects to Your App
 
 You don’t write code for this.
 It works like this:
+
 1. Domain (example.com) points to a server IP using DNS
 2. That server receives the request on standard ports (80 or 443)
 3. A system (like a load balancer or reverse proxy) forwards the request to your app
@@ -96,46 +106,53 @@ It works like this:
 ### 🔌 Do We Expose Ports in Production?
 
 Yes — but only what is needed.
-* Your app listens on a port inside the container
-* The platform (AWS, GCP, etc.) connects that to the outside world
+
+- Your app listens on a port inside the container
+- The platform (AWS, GCP, etc.) connects that to the outside world
 
 You usually expose:
-* One public port (like 443 for HTTPS)
+
+- One public port (like 443 for HTTPS)
 
 Everything else stays internal.
 
 ### 🔐 Internal Communication
 
-* Backend talks to database internally (not exposed)
-* Frontend talks to backend through APIs
+- Backend talks to database internally (not exposed)
+- Frontend talks to backend through APIs
 
 👉 Internal services are hidden for security
 
 ### 🌱 Environment Variables
 
 In development:
-* You use `.env` file
+
+- You use `.env` file
 
 In production:
-* Platforms provide environment variables through dashboard or config
+
+- Platforms provide environment variables through dashboard or config
 
 👉 No need to include `.env` inside container
 
 ### 🧠 Final Understanding
 
 Development:
-* You manually use `localhost` and ports
-* Everything is open and visible
+
+- You manually use `localhost` and ports
+- Everything is open and visible
 
 Production:
-* Domain replaces `localhost`
-* Only one entry point is exposed
-* Internal services communicate privately
-* Cloud handles routing automatically
+
+- Domain replaces `localhost`
+- Only one entry point is exposed
+- Internal services communicate privately
+- Cloud handles routing automatically
 
 ---
 
 **🔥 One-Line Summary**
+
 > Development is manual and open; production is controlled, secure, and handled by infrastructure.
 
 ---
@@ -143,15 +160,18 @@ Production:
 ## 🛠️ Troubleshooting & Useful Logs
 
 ### 1. "Container started, but I can't access the app!"
-If Docker Compose says `Started` but `localhost` refuses the connection, the container likely completely crashed immediately after starting. 
+
+If Docker Compose says `Started` but `localhost` refuses the connection, the container likely completely crashed immediately after starting.
 
 The #1 way to debug this is to check the container's logs:
+
 ```bash
 docker logs <container_name>
 # Example: docker logs secure_pern_frontend
 ```
 
 ### 2. The Great Vite + Node 18 Crash
+
 If you use an older Docker image base (like `node:18-alpine`) with a modern Vite React app, running `docker logs secure_pern_frontend` will spit out this exact error:
 
 ```text
@@ -168,6 +188,7 @@ ReferenceError: CustomEvent is not defined
 
 **The Fix:**
 Always ensure your `Dockerfile` uses a Node version compatible with your tooling! We fixed this by upgrading both `frontend/Dockerfile` and `backend/Dockerfile` to:
+
 ```dockerfile
 # Base image
 FROM node:20-alpine
@@ -181,19 +202,20 @@ FROM node:20-alpine
 
 👉 **Concept is same**, but **how you connect is different**
 
-* In development:
-`localhost:5000/api`
+- In development:
+  `localhost:5000/api`
 
-* In production:
-`https://yourdomain.com/api`
+- In production:
+  `https://yourdomain.com/api`
 
 👉 No `localhost` in production
 
 ### 🌍 Everything Uses Domain (DNS)
 
 In production:
-* Your app has a domain (example: `yourdomain.com`)
-* Requests go through this domain
+
+- Your app has a domain (example: `yourdomain.com`)
+- Requests go through this domain
 
 So in browser inspect (Network tab), you’ll see:
 `https://yourdomain.com/api/users`
@@ -205,6 +227,7 @@ So in browser inspect (Network tab), you’ll see:
 You have 2 common setups:
 
 #### 1. Same domain (most common for simple apps)
+
 `yourdomain.com        → frontend`
 `yourdomain.com/api    → backend`
 
@@ -212,6 +235,7 @@ You have 2 common setups:
 👉 Clean and simple
 
 #### 2. Separate domain (used in bigger systems)
+
 `yourdomain.com        → frontend`
 `api.yourdomain.com    → backend`
 
@@ -221,8 +245,9 @@ You have 2 common setups:
 
 You don’t write code for this.
 Cloud (AWS, GCP, etc.) or tools like Nginx handle it:
-* If request is `/` → send to frontend
-* If request is `/api` → send to backend
+
+- If request is `/` → send to frontend
+- If request is `/api` → send to backend
 
 👉 This is called **reverse proxy / routing**
 
@@ -232,6 +257,7 @@ When you hit:
 `https://yourdomain.com/api`
 
 Flow is:
+
 1. Domain → resolves to server (DNS)
 2. Server receives request
 3. Router / Load balancer checks path
@@ -241,28 +267,30 @@ Flow is:
 
 ### 🧠 Important Understanding
 
-* Browser only knows **domain**
-* Infrastructure handles **port + container mapping**
-* You don’t expose internal ports directly
+- Browser only knows **domain**
+- Infrastructure handles **port + container mapping**
+- You don’t expose internal ports directly
 
 ### 🚀 Role of AWS / GCP / Render
 
 They help you:
-* Attach domain to your app
-* Route traffic to correct service
-* Manage HTTPS (SSL)
-* Hide internal complexity
+
+- Attach domain to your app
+- Route traffic to correct service
+- Manage HTTPS (SSL)
+- Hide internal complexity
 
 👉 You just configure, not code
 
 ### 🔥 Final Clarity
 
-* Yes, frontend still calls backend ✅
-* But using **domain instead of localhost**
-* Routing is handled by **cloud / proxy**
-* Ports exist internally, not exposed directly
+- Yes, frontend still calls backend ✅
+- But using **domain instead of localhost**
+- Routing is handled by **cloud / proxy**
+- Ports exist internally, not exposed directly
 
 ---
 
 **🧩 One-Line Summary**
+
 > In production, your frontend calls the backend through a domain, and the cloud automatically routes that request to the correct service behind the scenes.
