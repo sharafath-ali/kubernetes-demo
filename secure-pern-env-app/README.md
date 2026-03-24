@@ -1,12 +1,29 @@
 # PERN Docker App
 
-This directory contains a complete containerized PERN (Postgres, Express, React, Node) stack.
+A complete containerized PERN (Postgres, Express, React, Node) stack with secure environment variable management and Docker networking.
+
+## 📑 Table of Contents
+
+1. [Project Structure](#-project-structure)
+2. [Getting Started](#-getting-started)
+3. [Checking the Database](#-checking-the-database)
+4. [Secure Environment Setup (.env)](#-secure-environment-setup-env)
+5. [Docker, Ports, Networking & Production](#-docker-ports-networking--production--simple-note)
+6. [How Frontend is Served in Production](#-how-frontend-is-served-in-production-2-ways)
+7. [Frontend ↔ Backend in Production (DNS & Routing)](#-frontend--backend-in-production-dns--routing)
+8. [Troubleshooting & Useful Logs](#️-troubleshooting--useful-logs)
+
+---
+
+## 📁 Project Structure
 
 - **`docker-compose.yml`**: Spins up the database, backend, and frontend.
 - **`backend/`**: Node.js REST API connecting to the Postgres database.
 - **`frontend/`**: Vite React app fetching from the backend API.
 
-## Getting Started
+---
+
+## 🚀 Getting Started
 
 1. Ensure Docker Desktop is running.
 2. Open your terminal in this directory (`kubernetes-demo/secure-pern-env-app`).
@@ -193,6 +210,97 @@ Always ensure your `Dockerfile` uses a Node version compatible with your tooling
 # Base image
 FROM node:20-alpine
 ```
+
+---
+
+## 🧠 How Frontend is Served in Production (2 Ways)
+
+There are two common patterns for serving a React frontend in production. Both are correct — it depends on how you design your system.
+
+---
+
+### ✅ 1. Backend Serves Everything
+
+#### 🔄 Flow
+
+```text
+Browser → Backend → HTML + JS (React build)
+```
+
+Then:
+
+```text
+Frontend (browser) → /api → Backend
+```
+
+#### 💡 What happens
+
+- Backend sends the **initial React build (HTML, CSS, JS)**
+- Browser loads it
+- React runs in browser
+- Then API calls go back to the backend
+
+#### ✅ When this is used
+
+- Simple apps
+- Node.js + Express setups
+- SSR (Next.js, etc.)
+
+#### 🧠 Key Idea
+
+> Backend = UI + API (everything handled in one place)
+
+---
+
+### ✅ 2. Reverse Proxy (Nginx / Cloud Routing)
+
+#### 🔄 Flow
+
+```text
+Browser → Nginx / Load Balancer
+```
+
+Then:
+
+```text
+/      → Frontend (React static files)
+/api   → Backend (Node API)
+```
+
+#### 💡 What happens
+
+- Nginx (or cloud) receives the request
+- It decides:
+  - `/` → frontend container
+  - `/api` → backend container
+- Frontend and backend are **separate services**
+
+#### ✅ When this is used
+
+- Docker setups
+- Production systems
+- Microservices
+- Scalable apps
+
+#### 🧠 Key Idea
+
+> Nginx = traffic controller
+> Frontend & Backend = separate
+
+---
+
+### ⚖️ Comparison
+
+| Approach | Simplicity | Scalability | Best For |
+|---|---|---|---|
+| Backend Serves Everything | ✅ Simple | ❌ Limited | Small apps, SSR |
+| Reverse Proxy (Nginx) | ⚙️ More setup | ✅ Scalable | Docker, Production |
+
+👉 Both are correct — depends on how you design your system.
+
+**🧩 One-Line Summary**
+
+> Either the backend serves the frontend, or a proxy (like Nginx) routes requests to frontend and backend separately.
 
 ---
 
