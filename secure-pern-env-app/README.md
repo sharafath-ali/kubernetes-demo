@@ -51,17 +51,14 @@ When you deploy, the production environment securely injects those values direct
 ### 🌐 Local Development (What you’re doing now)
 
 When you run apps locally:
-* Frontend → `localhost:3000`
-* Backend → `localhost:5000`
-* Database → `localhost:5432`
+* Frontend → `localhost:5174` (mapped to 5173)
+* Backend → `localhost:5001` (mapped to 5000)
+* Database → `localhost:5433` (mapped to 5432)
 
 👉 `localhost` means **your own machine**
 👉 Port is just a **door to access a running service**
 
-So when you type:
-`localhost:3000`
-You are telling the browser:
-> “Go to my machine and access the app running on port 3000”
+ 
 
 ### 🔗 How Services Talk in Docker
 
@@ -71,6 +68,12 @@ Instead, they use:
 
 👉 Docker provides internal networking
 👉 Each container can talk using service names
+
+**What does `networks: driver: bridge` do?**
+In our `docker-compose.yml`, we define a network with `driver: bridge`.
+* A **bridge** network acts as a private, isolated sandbox inside your machine. 
+* All containers placed on this bridge (`pern-network`) can freely resolve each other's names (e.g., the API container can just ask for `db` and Docker routes it directly).
+* It groups your stack securely, ensuring no exterior containers or local host processes can interfere with that internal communication.
 
 ### 🚀 What Changes in Production
 
