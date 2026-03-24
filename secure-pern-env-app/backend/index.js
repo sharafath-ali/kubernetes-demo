@@ -47,5 +47,8 @@ app.get('/api/requests', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Backend server running on port ${port}`);
+  const externalPort = process.env.API_EXTERNAL_PORT 
+    ? `\n➜  External (Browser): http://localhost:${process.env.API_EXTERNAL_PORT}` 
+    : '';
+  console.log(`\n> pern-backend@1.0.0 start\n➜  Internal (Docker):  http://localhost:${port}${externalPort}\n`);
 });

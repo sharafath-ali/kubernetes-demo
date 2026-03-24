@@ -27,6 +27,7 @@ services:
       - DB_NAME=${POSTGRES_DB}
       - DB_PORT=${DB_PORT}
       - PORT=${PORT}
+      - API_EXTERNAL_PORT=${API_EXTERNAL_PORT}
     depends_on:
       - db
     networks:
@@ -39,6 +40,7 @@ services:
       - "${FRONTEND_EXTERNAL_PORT}:5173"
     environment:
       - VITE_API_URL=${VITE_API_URL}
+      - FRONTEND_EXTERNAL_PORT=${FRONTEND_EXTERNAL_PORT}
     depends_on:
       - api
     networks:
