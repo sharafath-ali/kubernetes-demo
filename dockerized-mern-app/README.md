@@ -60,34 +60,43 @@ docker-compose down -v       # Stop + delete MongoDB data volume
 
 ---
 
-## nginx — Three Modes Explained
+## nginx — Complete Guide
 
 ---
 
-### Mode 1 — Local Development (no nginx at all)
+### First: nginx vs Node.js for serving React
 
-Vite's dev server handles everything. No build step, no nginx needed.
+When you run `npm run build`, React compiles to plain static files (`dist/`).
+You need *something* to serve those files over HTTP. You have two choices:
 
-```
-Browser
-  │
-  └── GET http://localhost:5173  ──→  Vite Dev Server
-                                        (hot reload, instant edits)
-```
+| Feature | nginx | Node.js (`serve` / `vite preview`) |
+|---|---|---|
+| Performance | ⚡ Extremely fast (written in C) | 🐌 Slower for static files |
+| Docker image size | ~5 MB (`nginx:alpine`) | ~150 MB (Node + packages) |
+| HTTP caching headers | ✅ Built-in | ❌ Manual setup |
+| Gzip compression | ✅ Built-in | ❌ Needs middleware |
+| SSL/HTTPS | ✅ First-class support | ❌ Complex config |
+| Reverse proxy / routing | ✅ Yes (core feature) | ❌ Not designed for it |
+| Used in production | ✅ Industry standard | ❌ Dev/demo only |
+
+**👉 nginx wins for production. Node.js servers are fine only for local demos.**
 
 ---
 
-### Mode 2 — Docker / Production: Static Serve Only ← THIS PROJECT
+### nginx has TWO ways it can be used in your MERN app
 
-`npm run build` produces static files in `dist/`. nginx serves those files to the browser.
-After the browser downloads the React app, **nginx steps out completely**.
-Every API call goes **directly** from the browser to Express — nginx is not involved.
+---
+
+### Option A — Static Serve Only ← THIS PROJECT
+
+nginx only serves the React `dist/` files. Once the browser has loaded React,
+nginx steps out. The React app calls Express **directly** on port 5000.
 
 ```
 Browser
   │
   ├── GET http://localhost:3000          ──→  nginx  ──→  serves dist/index.html
-  │                                           nginx job DONE ✅ steps out
+  │                                           nginx job DONE ✅, steps out
   │
   ├── GET http://localhost:5000/api/items  ──→  Express ──→  MongoDB
   │        (React calls Express directly, nginx NOT involved)
@@ -95,29 +104,38 @@ Browser
   └── POST http://localhost:5000/api/items ──→  Express ──→  MongoDB
 ```
 
-> nginx only serves the initial HTML/CSS/JS files. After that it does nothing.
+**nginx.conf for Option A (current):**
+```nginx
+server {
+    listen 80;
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
 
 ---
 
-### Mode 3 — Production on AWS: nginx as a True Gateway / Reverse Proxy
+### Option B — Reverse Proxy / Gateway ← PRODUCTION / AWS
 
-nginx is configured as a **reverse proxy**. The browser talks to **only one port (80/443)**.
-nginx reads the URL path and decides where to route the request internally.
+nginx sits in front of everything. The browser talks to **only one port (80/443)**.
+nginx reads the URL path and routes internally — Express is never exposed publicly.
 
 ```
 Browser
   │
-  └── Everything goes to nginx (port 80/443) — only ONE port exposed
+  └── Everything goes to nginx (port 80/443) only
             │
             ├── GET  /                   ──→  nginx serves React (dist/) directly
             │
             ├── GET  /api/items          ──→  nginx proxies ──→  Express:5000 ──→  MongoDB
-            │                                  (internally, browser never sees port 5000)
+            │                                  (port 5000 never exposed to internet)
             │
             └── POST /api/items          ──→  nginx proxies ──→  Express:5000 ──→  MongoDB
 ```
 
-**nginx.conf for proxy mode (AWS):**
+**nginx.conf for Option B (production):**
 ```nginx
 server {
     listen 80;
@@ -129,7 +147,7 @@ server {
         try_files $uri /index.html;
     }
 
-    # Proxy all /api/* requests to Express internally
+    # Proxy all /api/* to Express — browser never sees port 5000
     location /api/ {
         proxy_pass http://localhost:5000;
         proxy_http_version 1.1;
@@ -139,22 +157,25 @@ server {
 }
 ```
 
-**Mode 2 vs Mode 3 comparison:**
+---
 
-| | Mode 2 (This project) | Mode 3 (AWS Production) |
+### Option A vs Option B comparison
+
+| | Option A (This project) | Option B (AWS Production) |
 |---|---|---|
-| Ports exposed to internet | 3000 (nginx) + 5000 (Express) | Only 80/443 (nginx) |
-| CORS issues | Yes (different ports = different origin) | No (same origin, one port) |
-| Express exposed publicly | ✅ Yes | ❌ No (internal only, more secure) |
-| SSL/HTTPS | Separate config needed | nginx handles it centrally |
-| Rate limiting / auth at gateway | ❌ Not possible | ✅ nginx applies before Express |
+| Ports exposed to internet | 3000 (nginx) **+** 5000 (Express) | Only **80/443** (nginx) |
+| CORS issues | ⚠️ Yes (different origins) | ✅ No (same origin) |
+| Express port public | ✅ Yes (less secure) | ❌ No (internal only) |
+| SSL/HTTPS | Needs separate config | nginx handles centrally |
+| Rate limit / auth at gateway | ❌ Not possible | ✅ nginx can apply globally |
+| Complexity | Simple | Slightly more config |
 
 ---
 
-### Summary
+### All Modes Summary
 
-| Environment | nginx role | Notes |
+| Environment | Serving method | nginx role |
 |---|---|---|
-| Local dev (`npm run dev`) | ❌ Not used | Vite dev server handles everything |
-| Docker / this project | 📦 Serves `dist/` files only | React calls Express directly on port 5000 |
-| AWS / Production | 🔀 Full reverse proxy gateway | Single entry point, routes all traffic internally |
+| Local dev (`npm run dev`) | Vite Dev Server | ❌ Not used at all |
+| Docker / this project | nginx (Option A) | 📦 Serves `dist/` only, steps out after |
+| AWS / Production | nginx (Option B) | 🔀 Full gateway — proxies API calls too |
