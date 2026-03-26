@@ -216,6 +216,12 @@ node index.js      # Express on http://localhost:5000
 
 ---
 
+## AWS Deployment
+
+For instructions on how to tag and push your images to Amazon ECR, see the [AWS Push Guide](./AWS_PUSH_GUIDE.md).
+
+---
+
 ### All Modes Summary
 
 | Environment | Serving method | nginx role |
