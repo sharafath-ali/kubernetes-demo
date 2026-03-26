@@ -1,79 +1,79 @@
 # AWS Elastic Container Registry (ECR) Deployment Guide
 
-This document outlines the professional workflow for tagging and pushing containerized images to Amazon ECR. 
+This document outlines the professional workflows for tagging and pushing containerized images to Amazon ECR. 
 
 ---
 
-## 🏗️ Deployment Workflow Overview
+## 🏗️ 1. Choosing a Deployment Strategy
 
-To deploy your MERN stack to AWS, you must synchronize your local Docker images with your remote ECR repository. This guide assumes you are pushing multiple services (Server and Client) into a single unified repository using distinct image tags.
+There are two primary ways to organize your images in AWS ECR. Choose the one that best fits your project's scale.
+
+### Option A: Distinct Tagging (Single Repository)
+*Best for small projects/demos.*  
+All services (`server`, `client`) are pushed to a single repository (e.g., `my-app`) using unique tags.
+*   **Pros**: Simpler to manage; fewer ECR repositories to create.
+*   **Cons**: Shared lifecycle policies; tag clutter.
+
+### Option B: Separate Repositories (Industrial Standard)
+*Best for production/enterprise.*  
+Each service gets its own dedicated ECR repository (e.g., `my-app-server` and `my-app-client`).
+*   **Pros**: Independent versioning (`:latest`, `:v1`); per-service permissions; dedicated lifecycle policies.
+*   **Cons**: Requires creating multiple repositories in AWS.
 
 ---
 
-## 📋 1. Prerequisites
+## 📋 2. Prerequisites
 
-Before initiating the push, ensure you meet the following requirements:
-
-1.  **AWS CLI Configured**: Your local machine must have the AWS CLI installed and configured with appropriate IAM permissions (e.g., `AmazonEC2ContainerRegistryFullAccess`).
-2.  **Docker Daemon Running**: Ensure Docker Desktop is active.
-3.  **ECR Authentication**: Generate a temporary login token and authenticate your Docker client:
+Before initiating the push, ensure you are authenticated:
 
 ```powershell
+# ECR Authentication (valid for 12 hours)
 aws ecr get-login-password --region <REGION> | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com
 ```
 
 ---
 
-## 🏷️ 2. Image Tagging Strategy
+## 🚀 3. Implementation Workflow
 
-We use a **Distinct Tagging Strategy** to allow multiple services to coexist within the same repository (`my-app`).
+### Workflow for Option A: Single Repository (`my-app`)
 
-| Service | Local Image | Target ECR Tag |
+| Service | Tagging Command | Push Command |
 | :--- | :--- | :--- |
-| **Express Server** | `dockerized-mern-app-server:latest` | `<AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app:server` |
-| **React Client** | `dockerized-mern-app-client:latest` | `<AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app:client` |
+| **Server** | `docker tag ...-server:latest .../my-app:server` | `docker push .../my-app:server` |
+| **Client** | `docker tag ...-client:latest .../my-app:client` | `docker push .../my-app:client` |
 
----
+### Workflow for Option B: Separate Repositories (Recommended)
 
-## 🚀 3. Push Instructions
+Ensure you have created the repositories in the AWS Console first.
 
-Execute the following commands in your terminal to tag and upload your images.
-
-### A. Deploy Server Image
 ```powershell
-# Tagging
-docker tag dockerized-mern-app-server:latest <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app:server
+# Deploy Server to its own repository
+docker tag dockerized-mern-app-server:latest <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app-server:latest
+docker push <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app-server:latest
 
-# Pushing
-docker push <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app:server
-```
-
-### B. Deploy Client Image
-```powershell
-# Tagging
-docker tag dockerized-mern-app-client:latest <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app:client
-
-# Pushing
-docker push <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app:client
+# Deploy Client to its own repository
+docker tag dockerized-mern-app-client:latest <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app-client:latest
+docker push <AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/my-app-client:latest
 ```
 
 ---
 
 ## ✅ 4. Final Verification
 
-Once the push is complete, verify the presence of your images in the AWS Console. Your repository should look like the following:
+After pushing, verify your images in the AWS Console. 
 
+**If using Option A (Single Repo), your view will look like this:**
 ![ECR Console Verification](./aws.png)
 
 ---
 
 ## 🛠️ 5. Common Troubleshooting
 
-| Issue | Potential Cause | Resolution |
-| :--- | :--- | :--- |
-| `No such image` | The image has not been built locally yet. | Run `docker-compose build` first. |
-| `EOF` or `Retrying` | The authentication token has expired. | Re-run the ECR Login command (Step 1). |
-| `Repository not found` | The ECR repository name is misspelled. | Confirm the repository name in the AWS Console. |
+| Issue | Resolution |
+| :--- | :--- |
+| `Repository not found` | Ensure the repository name matches exactly what exists in ECR. |
+| `Authentication failed` | Re-run the ECR Login command (Prerequisites). |
+| `No such image` | Build images locally using `docker-compose build` first. |
 
 ---
 
