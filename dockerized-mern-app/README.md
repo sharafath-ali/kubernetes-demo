@@ -36,6 +36,13 @@ dockerized-mern-app/
 docker-compose up --build
 ```
 
+## Environment Variables
+
+The `env_file: - .env` line in `docker-compose.yml` ensures that all variables in `.env` are injected into the container's environment and thus available via `process.env` in your Node.js code.
+
+- **Substitution**: `${VAR}` in `docker-compose.yml` is replaced by Docker Compose before starting services.
+- **Injection**: `env_file` passes variables directly into the running container.
+
 | URL | Description |
 |---|---|
 | http://localhost:3000 | React frontend |
