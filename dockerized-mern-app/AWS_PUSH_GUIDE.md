@@ -79,3 +79,21 @@ After pushing, verify your images in the AWS Console.
 
 > [!IMPORTANT]  
 > **Security Note**: This guide uses `<AWS_ACCOUNT_ID>` and `<REGION>` as placeholders. For your local use, replace these with your actual 12-digit AWS ID and region (e.g., `ap-southeast-2`).
+
+---
+
+## 🐳 6. Docker Compose in Deployment
+
+### What Docker Compose Actually Does
+
+> [!NOTE]
+> Docker Compose does **NOT** create a single image. Each service (`backend`, `frontend`, `db`) has its own **separate image**. Compose is purely an **orchestration tool** — it runs multiple containers together as a single application.
+
+| Concept | Detail |
+| :--- | :--- |
+| **Images** | Each service builds/pulls its own independent image |
+| **Compose role** | Declares how services run, network together, and share volumes |
+| **What you push** | Only the **images** (to ECR). You do NOT push Compose itself |
+| **Compose file** | Copied to EC2 and used there to spin up all containers |
+
+---
