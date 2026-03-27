@@ -30,6 +30,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+    # image: ${ECR_REGISTRY}/my-app:server // use this for ECR deployment , it is already pushed to ECR and it is a private image
     container_name: mern_server
     restart: unless-stopped
     ports:
@@ -45,6 +46,7 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
+    # image: ${ECR_REGISTRY}/my-app:client // use this for ECR deployment , it is already pushed to ECR and it is a private image
     container_name: mern_client
     restart: unless-stopped
     ports:
