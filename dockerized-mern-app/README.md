@@ -216,9 +216,86 @@ node index.js      # Express on http://localhost:5000
 
 ---
 
-## AWS Deployment
+## AWS ECR Deployment
 
-For instructions on how to tag and push your images to Amazon ECR, see the [AWS Push Guide](./AWS_PUSH_GUIDE.md).
+This project supports two run modes — **local build** and **ECR image** — controlled by a single line in `docker-compose.yml`.
+
+For full ECR push instructions, see the [AWS Push Guide](./AWS_PUSH_GUIDE.md).
+
+---
+
+### Mode 1 — Local Build (default, for development)
+
+The `server` and `client` are built from source on your machine:
+
+```yaml
+server:
+  build:
+    context: ./server
+    dockerfile: Dockerfile
+  # image: ${ECR_REGISTRY}/my-app:server  ← commented out
+
+client:
+  build:
+    context: ./client
+    dockerfile: Dockerfile
+  # image: ${ECR_REGISTRY}/my-app:client  ← commented out
+```
+
+```bash
+docker compose up --build
+```
+
+> Use this during active development when you are making code changes.
+
+---
+
+### Mode 2 — ECR Image (for deployment / testing pre-built images)
+
+Images are already built and pushed to AWS ECR. Comment out the `build` block and uncomment the `image` line:
+
+```yaml
+server:
+  # build:
+  #   context: ./server
+  #   dockerfile: Dockerfile
+  image: ${ECR_REGISTRY}/my-app:server  # pre-built image from ECR
+
+client:
+  # build:
+  #   context: ./client
+  #   dockerfile: Dockerfile
+  image: ${ECR_REGISTRY}/my-app:client  # pre-built image from ECR
+```
+
+**Step 1 — Set the registry in your `.env`:**
+```env
+ECR_REGISTRY=<account-id>.dkr.ecr.<region>.amazonaws.com
+```
+
+**Step 2 — Authenticate Docker to ECR:**
+```bash
+aws ecr get-login-password --region <region> | \
+  docker login --username AWS --password-stdin <account-id>.dkr.ecr.<region>.amazonaws.com
+```
+
+**Step 3 — Pull and run:**
+```bash
+docker compose up -d
+```
+
+> The images are **private** — ECR login is required before `docker compose up`.
+
+---
+
+### Quick comparison
+
+| | Local Build | ECR Image |
+|---|---|---|
+| Who builds the image | Your machine | Pre-built on AWS ECR |
+| Requires `aws` CLI login | No | Yes |
+| Reflects latest local code | Yes | Only if image was re-pushed |
+| Use case | Development | Deployment / CI testing |
 
 ---
 
