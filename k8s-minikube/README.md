@@ -16,12 +16,22 @@ docker login
 ```
 Enter your Docker Hub username and password when prompted.
 
-### 2. Build the Docker Image
+### 2. Build or Tag the Docker Image
+
+**Scenario A: Building a new image**
 Build the Docker image from your `Dockerfile`. Make sure to tag it with your Docker Hub username, the repository name, and an optional version tag (like `latest` or `1.0.0`).
 
 ```bash
 docker build -t <your-dockerhub-username>/k8s-minikube-demo:latest .
 ```
+
+**Scenario B: If the image is already created**
+If you have already built an image locally (e.g., named `k8s-minikube-demo:latest`), you just need to tag it so that Docker knows where to push it:
+
+```bash
+docker tag k8s-minikube-demo:latest <your-dockerhub-username>/k8s-minikube-demo:latest
+```
+
 *Note: Replace `<your-dockerhub-username>` with your actual Docker Hub username.*
 
 ### 3. Push the Image to Docker Hub
