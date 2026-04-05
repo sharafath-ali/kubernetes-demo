@@ -90,19 +90,27 @@ kubectl cluster-info
 
 Once your cluster is running and your manifest files are created, it's time to apply them to the cluster.
 
-### 1. Apply the Deployment
-This command tells Kubernetes to read the `deployment.yaml` file and create the requested pods.
+### 1. Apply the Manifests
+
+You have two options for applying your configuration files:
+
+**Option A: Apply all at once (Recommended)**
+You can pass the entire directory to `kubectl apply`. This tells Kubernetes to read all `.yaml` files inside the `k8s/` directory and apply them simultaneously, creating both your Deployment and Service in one swoop.
 ```bash
-kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/
 ```
 
-### 2. Apply the Service
-Next, apply the `service.yaml` file to create the networking rules that will expose your pods.
+**Option B: Apply separately**
+Alternatively, you can apply each file individually if you want to test them step-by-step.
 ```bash
+# Apply the deployment first
+kubectl apply -f k8s/deployment.yaml
+
+# Then apply the service
 kubectl apply -f k8s/service.yaml
 ```
 
-### 3. Verify Your Resources
+### 2. Verify Your Resources
 You can check the status of your newly created pods and services using these commands:
 ```bash
 # Check if pods are running
@@ -112,7 +120,7 @@ kubectl get pods
 kubectl get services
 ```
 
-### 4. Access the Application
+### 3. Access the Application
 Because Minikube runs inside a virtual environment (or container), a `NodePort` service isn't immediately accessible on `localhost`. Minikube provides a built-in command to tunnel the service and open it in your browser:
 ```bash
 minikube service kubernetes-demo-api-service
