@@ -140,10 +140,9 @@ If you prefer to deploy everything with a single command instead of running the 
 
 The script will automatically start Minikube, apply the Kubernetes configurations from the `k8s/` folder, wait for your pods to be ready, and then automatically launch the application in your browser.
 
-To use it, simply make it executable and run it from your terminal:
+To run the complete automated deployment, simply use the npm script we set up:
 ```bash
-chmod +x deploy.sh
-./deploy.sh
+npm run deploy
 ```
 
 ## 5. Clean Up (Stopping the Cluster)
