@@ -25,8 +25,8 @@ Build the Docker image from your `Dockerfile`. Make sure to tag it with your Doc
 docker build -t <your-dockerhub-username>/k8s-minikube-demo:latest .
 ```
 
-**Scenario B: If the image is already created**
-If you have already built an image locally (e.g., named `k8s-minikube-demo:latest`), you just need to tag it so that Docker knows where to push it:
+**Scenario B: If the image is already created (without proper tagging)**
+If you have already built an image locally using a generic build command like `docker build -t k8s-minikube-demo:latest .` without your Docker Hub username, you will need to apply a new tag to the existing image so that Docker knows where to push it:
 
 ```bash
 docker tag k8s-minikube-demo:latest <your-dockerhub-username>/k8s-minikube-demo:latest
