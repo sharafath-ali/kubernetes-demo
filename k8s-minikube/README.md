@@ -133,3 +133,15 @@ This will automatically map the cluster port to your local machine and open the 
 
 *You should see your API successfully running in the browser!*
 ![Application Result](k8s/finalresult.png)
+
+## 4. Automation (Optional)
+
+If you prefer to deploy everything with a single command instead of running the steps manually, you can use the included bash script!
+
+The script will automatically start Minikube, apply the Kubernetes configurations from the `k8s/` folder, wait for your pods to be ready, and then automatically launch the application in your browser.
+
+To use it, simply make it executable and run it from your terminal:
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
