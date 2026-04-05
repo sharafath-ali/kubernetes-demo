@@ -79,6 +79,13 @@ After Minikube is running, you can use `kubectl` (the command-line tool for inte
 kubectl get nodes
 ```
 
+### 3. `kubectl cluster-info`
+To view the URLs for the Kubernetes control plane and core services (like CoreDNS), run this command. It's useful for verifying that the API server is responding correctly and to check exactly where your cluster components are hosted.
+
+```bash
+kubectl cluster-info
+```
+
 ## Applying Your Configuration
 
 Once your cluster is running and your manifest files are created, it's time to apply them to the cluster.
