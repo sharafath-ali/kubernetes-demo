@@ -114,8 +114,12 @@ kubectl apply -f k8s/service.yaml
 You can check the status of your newly created pods and services using these commands:
 ```bash
 # Check if pods are running
-kubectl get pods
+kubectl get pods -w
+```
+*You should see output similar to this as your replicas spin up:*
+![Pods Running](2nodeapp.png)
 
+```bash
 # Check if the service was created
 kubectl get services
 ```
@@ -126,3 +130,6 @@ Because Minikube runs inside a virtual environment (or container), a `NodePort` 
 minikube service kubernetes-demo-api-service
 ```
 This will automatically map the cluster port to your local machine and open the application in your default web browser.
+
+*You should see your API successfully running in the browser!*
+![Application Result](appresult.png)
