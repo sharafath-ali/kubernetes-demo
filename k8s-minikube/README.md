@@ -132,4 +132,4 @@ minikube service kubernetes-demo-api-service
 This will automatically map the cluster port to your local machine and open the application in your default web browser.
 
 *You should see your API successfully running in the browser!*
-![Application Result](appresult.png)
+![Application Result](k8s/finalresult.png)
