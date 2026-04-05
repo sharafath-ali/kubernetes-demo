@@ -145,3 +145,13 @@ To use it, simply make it executable and run it from your terminal:
 chmod +x deploy.sh
 ./deploy.sh
 ```
+
+## 5. Clean Up (Stopping the Cluster)
+
+Because Minikube runs a virtual machine (or Docker containers) in the background, it consumes CPU and Memory. When you are done testing your application, you should stop the cluster to free up your system resources.
+
+To stop Minikube safely, run:
+```bash
+minikube stop
+```
+*(Note: This does not delete your data or configurations. Next time you run `minikube start`, your cluster will pause right back where you left it!)*
