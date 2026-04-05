@@ -154,3 +154,15 @@ To stop Minikube safely, run:
 minikube stop
 ```
 *(Note: This does not delete your data or configurations. Next time you run `minikube start`, your cluster will pause right back where you left it!)*
+
+---
+
+### Troubleshooting: `connection refused` Error
+
+If you attempt to run `minikube start` after previously stopping the cluster and encounter a `failed to download openapi` or `connection refused` error on port `8443`, your Minikube networking or certificates may have become desynced.
+
+The easiest way to fix this in local development is to completely delete the old cluster and start fresh:
+```bash
+minikube delete
+```
+After running this, you can simply run `npm run deploy` to instantly recreate the cluster and redeploy everything automatically!
