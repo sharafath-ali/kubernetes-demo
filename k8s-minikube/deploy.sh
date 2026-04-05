@@ -21,5 +21,8 @@ kubectl get pods
 echo "Getting services ..."
 kubectl get services
 
+echo "Fetching the main service"
+kubectl get services kubernetes-demo-api-service
+
 echo "Starting Minikube service tunnel..."
 minikube service kubernetes-demo-api-service
