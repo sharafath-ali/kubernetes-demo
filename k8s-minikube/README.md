@@ -58,3 +58,56 @@ Pods matching a Deployment are ephemeral; they can be destroyed and created cons
 - **Stable IP/DNS:** It gives your application a single, unchanging IP address and DNS name inside the cluster.
 - **Load Balancing:** It automatically spreads incoming network traffic across all the healthy replicas defined in your Deployment.
 - **Exposure:** By using a `type: NodePort` (or `LoadBalancer`), the Service allows external traffic (like your local browser) to access the application running inside the isolated Kubernetes cluster.
+
+
+
+## Starting Your Local Cluster
+
+Before applying your Kubernetes configuration files, you need to start your local Minikube cluster.
+
+### 1. `minikube start`
+This command initializes and starts a local single-node Kubernetes cluster. It sets up a virtual machine (or uses Docker containers) on your machine that runs all the necessary Kubernetes control plane components.
+
+```bash
+minikube start
+```
+
+### 2. `kubectl get nodes`
+After Minikube is running, you can use `kubectl` (the command-line tool for interacting with the Kubernetes API) to verify the status of your cluster. This command lists the active nodes in your cluster. With Minikube, you should see exactly one node named `minikube` with a `Ready` status.
+
+```bash
+kubectl get nodes
+```
+
+## Applying Your Configuration
+
+Once your cluster is running and your manifest files are created, it's time to apply them to the cluster.
+
+### 1. Apply the Deployment
+This command tells Kubernetes to read the `deployment.yaml` file and create the requested pods.
+```bash
+kubectl apply -f k8s/deployment.yaml
+```
+
+### 2. Apply the Service
+Next, apply the `service.yaml` file to create the networking rules that will expose your pods.
+```bash
+kubectl apply -f k8s/service.yaml
+```
+
+### 3. Verify Your Resources
+You can check the status of your newly created pods and services using these commands:
+```bash
+# Check if pods are running
+kubectl get pods
+
+# Check if the service was created
+kubectl get services
+```
+
+### 4. Access the Application
+Because Minikube runs inside a virtual environment (or container), a `NodePort` service isn't immediately accessible on `localhost`. Minikube provides a built-in command to tunnel the service and open it in your browser:
+```bash
+minikube service kubernetes-demo-api-service
+```
+This will automatically map the cluster port to your local machine and open the application in your default web browser.
