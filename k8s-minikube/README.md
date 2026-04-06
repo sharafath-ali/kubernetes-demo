@@ -141,7 +141,13 @@ If you prefer to deploy everything with a single command instead of running the 
 > [!IMPORTANT]
 > **Always use Git Bash or any bash-related terminal** to make the `deploy.sh` script run properly, especially on a Windows machine.
 
-The script will automatically start Minikube, apply the Kubernetes configurations from the `k8s/` folder, wait for your pods to be ready, and then automatically launch the application in your browser.
+> [!CAUTION]
+> You **must** ensure your cluster is running by executing `minikube start` *before* running this deployment script. 
+
+**Infrastructure as Code (IaC) Best Practice:** 
+You might wonder why `minikube start` isn't included inside `deploy.sh`. In the industry, **Infrastructure Provisioning** (creating the cluster, which is slow and done rarely) is kept strictly separate from **Application Deployment** (pushing code updates, which is fast and done frequently). This separation of concerns is a core principle in modern Infrastructure as Code (IaC) and GitOps workflows!
+
+Once your Minikube cluster is running, this script will automatically build and push your Docker image, apply the Kubernetes configurations from the `k8s/` folder, and expose the application service for you.
 
 To run the complete automated deployment, simply use the npm script we set up:
 ```bash
