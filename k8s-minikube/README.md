@@ -138,6 +138,9 @@ This will automatically map the cluster port to your local machine and open the 
 
 If you prefer to deploy everything with a single command instead of running the steps manually, you can use the included bash script!
 
+> [!IMPORTANT]
+> **Always use Git Bash or any bash-related terminal** to make the `deploy.sh` script run properly, especially on a Windows machine.
+
 The script will automatically start Minikube, apply the Kubernetes configurations from the `k8s/` folder, wait for your pods to be ready, and then automatically launch the application in your browser.
 
 To run the complete automated deployment, simply use the npm script we set up:

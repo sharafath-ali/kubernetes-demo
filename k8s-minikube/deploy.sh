@@ -4,7 +4,7 @@ set -e
 
 NAME="k8s-demo-api"
 USERNAME="sharafathalivk"
-IMAGE="$USERNAME/$NAME:lastest"
+IMAGE="$USERNAME/$NAME:latest"
 
 echo "Building Docker image ..."
 docker build -t $IMAGE .
